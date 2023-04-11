@@ -1,5 +1,5 @@
 /**
- * Plugin: "input_autogrow" (Tom Select)
+ * Plugin: "input_autogrow" (Fab Select)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License. You may obtain a copy of the License at:
@@ -12,19 +12,17 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
+import FabSelectize from "../../fab-selectize";
 
-export default function(this:FabSelectize) {
-	var self = this;
-	var orig_deleteSelection = self.deleteSelection;
+export default function (this: FabSelectize) {
+    var self = this;
+    var orig_deleteSelection = self.deleteSelection;
 
-	this.hook('instead','deleteSelection',(evt:KeyboardEvent) => {
+    this.hook("instead", "deleteSelection", (evt: KeyboardEvent) => {
+        if (self.activeItems.length) {
+            return orig_deleteSelection.call(self, evt);
+        }
 
-		if( self.activeItems.length ){
-			return orig_deleteSelection.call(self, evt);
-		}
-
-		return false;
-	});
-
-};
+        return false;
+    });
+}

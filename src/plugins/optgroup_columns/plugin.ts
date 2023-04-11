@@ -1,5 +1,5 @@
 /**
- * Plugin: "optgroup_columns" (Tom Select.js)
+ * Plugin: "optgroup_columns" (Fab Select.js)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -13,47 +13,45 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
-import * as constants from '../../constants';
-import { parentMatch, nodeIndex } from '../../vanilla';
+import FabSelectize from "../../fab-selectize";
+import * as constants from "../../constants";
+import { parentMatch, nodeIndex } from "../../vanilla";
 
-export default function(this:FabSelectize) {
-	var self = this;
+export default function (this: FabSelectize) {
+    var self = this;
 
-	var orig_keydown = self.onKeyDown;
+    var orig_keydown = self.onKeyDown;
 
-	self.hook('instead','onKeyDown',(evt:KeyboardEvent)=>{
-		var index, option, options, optgroup;
+    self.hook("instead", "onKeyDown", (evt: KeyboardEvent) => {
+        var index, option, options, optgroup;
 
-		if( !self.isOpen || !(evt.keyCode === constants.KEY_LEFT || evt.keyCode === constants.KEY_RIGHT)) {
-			return orig_keydown.call(self,evt);
-		}
+        if (!self.isOpen || !(evt.keyCode === constants.KEY_LEFT || evt.keyCode === constants.KEY_RIGHT)) {
+            return orig_keydown.call(self, evt);
+        }
 
-		self.ignoreHover	= true;
-		optgroup			= parentMatch(self.activeOption,'[data-group]');
-		index				= nodeIndex(self.activeOption,'[data-selectable]');
+        self.ignoreHover = true;
+        optgroup = parentMatch(self.activeOption, "[data-group]");
+        index = nodeIndex(self.activeOption, "[data-selectable]");
 
-		if( !optgroup ){
-			return;
-		}
+        if (!optgroup) {
+            return;
+        }
 
-		if( evt.keyCode === constants.KEY_LEFT ){
-			optgroup = optgroup.previousSibling;
-		} else {
-			optgroup = optgroup.nextSibling;
-		}
+        if (evt.keyCode === constants.KEY_LEFT) {
+            optgroup = optgroup.previousSibling;
+        } else {
+            optgroup = optgroup.nextSibling;
+        }
 
-		if( !optgroup ){
-			return;
-		}
+        if (!optgroup) {
+            return;
+        }
 
-		options				= (<HTMLOptGroupElement>optgroup).querySelectorAll('[data-selectable]');
-		option				= options[ Math.min(options.length - 1, index) ] as HTMLElement;
+        options = (<HTMLOptGroupElement>optgroup).querySelectorAll("[data-selectable]");
+        option = options[Math.min(options.length - 1, index)] as HTMLElement;
 
-		if( option ){
-			self.setActiveOption(option);
-		}
-
-	});
-
-};
+        if (option) {
+            self.setActiveOption(option);
+        }
+    });
+}

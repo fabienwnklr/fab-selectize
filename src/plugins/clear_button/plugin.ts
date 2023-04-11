@@ -1,5 +1,5 @@
 /**
- * Plugin: "dropdown_header" (Tom Select)
+ * Plugin: "dropdown_header" (Fab Select)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -13,39 +13,40 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
-import { getDom } from '../../vanilla';
-import { CBOptions } from './types';
+import FabSelectize from "../../fab-selectize";
+import { getDom } from "../../vanilla";
+import { CBOptions } from "./types";
 
-export default function(this:FabSelectize, userOptions:CBOptions) {
-	const self = this;
+export default function (this: FabSelectize, userOptions: CBOptions) {
+    const self = this;
 
-	const options = Object.assign({
-		className: 'clear-button',
-		title: 'Clear All',
-		html: (data:CBOptions) => {
-			return `<div class="${data.className}" title="${data.title}">&#10799;</div>`;
-		}
-	}, userOptions);
+    const options = Object.assign(
+        {
+            className: "clear-button",
+            title: "Clear All",
+            html: (data: CBOptions) => {
+                return `<div class="${data.className}" title="${data.title}">&#10799;</div>`;
+            },
+        },
+        userOptions
+    );
 
-	self.on('initialize',()=>{
-		var button = getDom(options.html(options));
-		button.addEventListener('click',(evt)=>{
+    self.on("initialize", () => {
+        var button = getDom(options.html(options));
+        button.addEventListener("click", evt => {
+            if (self.isDisabled) {
+                return;
+            }
 
-			if( self.isDisabled ){
-				return;
-			}
+            self.clear();
 
-			self.clear();
+            if (self.settings.mode === "single" && self.settings.allowEmptyOption) {
+                self.addItem("");
+            }
 
-			if( self.settings.mode === 'single' && self.settings.allowEmptyOption ){
-				self.addItem('');
-			}
-
-			evt.preventDefault();
-			evt.stopPropagation();
-		});
-		self.control.appendChild(button);
-	});
-
-};
+            evt.preventDefault();
+            evt.stopPropagation();
+        });
+        self.control.appendChild(button);
+    });
+}

@@ -1,5 +1,5 @@
 /**
- * Plugin: "no_active_items" (Tom Select)
+ * Plugin: "no_active_items" (Fab Select)
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
  * file except in compliance with the License. You may obtain a copy of the License at:
@@ -12,9 +12,9 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
+import FabSelectize from "../../fab-selectize";
 
-export default function(this:FabSelectize) {
-	this.hook('instead','setActiveItem',() => {});
-	this.hook('instead','selectAll',() => {});
-};
+export default function (this: FabSelectize) {
+    this.hook("instead", "setActiveItem", () => {});
+    this.hook("instead", "selectAll", () => {});
+}

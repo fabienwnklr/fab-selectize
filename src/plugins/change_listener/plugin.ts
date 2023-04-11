@@ -1,5 +1,5 @@
 /**
- * Plugin: "change_listener" (Tom Select)
+ * Plugin: "change_listener" (Fab Select)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -13,11 +13,11 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
-import { addEvent } from '../../utils';
+import FabSelectize from "../../fab-selectize";
+import { addEvent } from "../../utils";
 
-export default function(this:FabSelectize) {
-	addEvent(this.input,'change',()=>{
-		this.sync();
-	});
-};
+export default function (this: FabSelectize) {
+    addEvent(this.input, "change", () => {
+        this.sync();
+    });
+}

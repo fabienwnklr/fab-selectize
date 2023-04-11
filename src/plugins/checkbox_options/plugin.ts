@@ -1,5 +1,5 @@
 /**
- * Plugin: "restore_on_backspace" (Tom Select)
+ * Plugin: "restore_on_backspace" (Fab Select)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -13,91 +13,86 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
-import { preventDefault, hash_key } from '../../utils';
-import { getDom } from '../../vanilla';
+import FabSelectize from "../../fab-selectize";
+import { preventDefault, hash_key } from "../../utils";
+import { getDom } from "../../vanilla";
 
+export default function (this: FabSelectize) {
+    var self = this;
+    var orig_onOptionSelect = self.onOptionSelect;
 
-export default function(this:FabSelectize) {
-	var self = this;
-	var orig_onOptionSelect = self.onOptionSelect;
+    self.settings.hideSelected = false;
 
-	self.settings.hideSelected = false;
+    // update the checkbox for an option
+    var UpdateCheckbox = function (option: HTMLElement) {
+        setTimeout(() => {
+            var checkbox = option.querySelector("input");
+            if (checkbox instanceof HTMLInputElement) {
+                if (option.classList.contains("selected")) {
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = false;
+                }
+            }
+        }, 1);
+    };
 
+    // add checkbox to option template
+    self.hook("after", "setupTemplates", () => {
+        var orig_render_option = self.settings.render.option;
 
-	// update the checkbox for an option
-	var UpdateCheckbox = function(option:HTMLElement){
-		setTimeout(()=>{
-			var checkbox = option.querySelector('input');
-			if( checkbox instanceof HTMLInputElement ){
-				if( option.classList.contains('selected') ){
-					checkbox.checked = true;
-				}else{
-					checkbox.checked = false;
-				}
-			}
-		},1);
-	};
+        self.settings.render.option = (data, escape_html) => {
+            var rendered = getDom(orig_render_option.call(self, data, escape_html));
+            var checkbox = document.createElement("input");
+            checkbox.addEventListener("click", function (evt) {
+                preventDefault(evt);
+            });
 
-	// add checkbox to option template
-	self.hook('after','setupTemplates',() => {
+            checkbox.type = "checkbox";
+            const hashed = hash_key(data[self.settings.valueField]);
 
-		var orig_render_option = self.settings.render.option;
+            if (hashed && self.items.indexOf(hashed) > -1) {
+                checkbox.checked = true;
+            }
 
-		self.settings.render.option = (data, escape_html) => {
-			var rendered = getDom(orig_render_option.call(self, data, escape_html));
-			var checkbox = document.createElement('input');
-			checkbox.addEventListener('click',function(evt){
-				preventDefault(evt);
-			});
+            rendered.prepend(checkbox);
+            return rendered;
+        };
+    });
 
-			checkbox.type = 'checkbox';
-			const hashed = hash_key(data[self.settings.valueField]);
+    // uncheck when item removed
+    self.on("item_remove", (value: string) => {
+        var option = self.getOption(value);
 
+        if (option) {
+            // if dropdown hasn't been opened yet, the option won't exist
+            option.classList.remove("selected"); // selected class won't be removed yet
+            UpdateCheckbox(option);
+        }
+    });
 
-			if( hashed && self.items.indexOf(hashed) > -1 ){
-				checkbox.checked = true;
-			}
+    // check when item added
+    self.on("item_add", (value: string) => {
+        var option = self.getOption(value);
 
-			rendered.prepend(checkbox);
-			return rendered;
-		};
-	});
+        if (option) {
+            // if dropdown hasn't been opened yet, the option won't exist
+            UpdateCheckbox(option);
+        }
+    });
 
-	// uncheck when item removed
-	self.on('item_remove',(value:string) => {
-		var option = self.getOption(value);
-
-		if( option ){ // if dropdown hasn't been opened yet, the option won't exist
-			option.classList.remove('selected'); // selected class won't be removed yet
-			UpdateCheckbox(option);
-		}
-	});
-
-	// check when item added
-	self.on('item_add',(value:string) => {
-		var option = self.getOption(value);
-
-		if( option ){ // if dropdown hasn't been opened yet, the option won't exist
-			UpdateCheckbox(option);
-		}
-	});
-
-
-	// remove items when selected option is clicked
-	self.hook('instead','onOptionSelect',( evt:KeyboardEvent, option:HTMLElement )=>{
-
-		if( option.classList.contains('selected') ){
-			option.classList.remove('selected')
-			self.removeItem(option.dataset.value);
-			self.refreshOptions();
-			preventDefault(evt,true);
-			return;
+    // remove items when selected option is clicked
+    self.hook("instead", "onOptionSelect", (evt: KeyboardEvent, option: HTMLElement) => {
+        if (option.classList.contains("selected")) {
+            option.classList.remove("selected");
+            self.removeItem(option.dataset.value);
+            self.refreshOptions();
+            preventDefault(evt, true);
+            return;
         }
 
-		orig_onOptionSelect.call(self, evt, option);
+        orig_onOptionSelect.call(self, evt, option);
 
-		UpdateCheckbox(option);
-	});
-
-};
+        UpdateCheckbox(option);
+    });
+}

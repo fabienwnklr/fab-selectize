@@ -1,5 +1,5 @@
 /**
- * Plugin: "remove_button" (Tom Select)
+ * Plugin: "remove_button" (Fab Select)
  * Copyright (c) contributors
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
@@ -13,64 +13,59 @@
  *
  */
 
-import FabSelectize from '../../fab-selectize';
-import { getDom } from '../../vanilla';
-import { escape_html, preventDefault, addEvent } from '../../utils';
-import { TomOption, TomItem } from '../../types/index';
-import { RBOptions } from './types';
+import FabSelectize from "../../fab-selectize";
+import { getDom } from "../../vanilla";
+import { escape_html, preventDefault, addEvent } from "../../utils";
+import { FabOption, FabItem } from "../../types/index";
+import { RBOptions } from "./types";
 
-export default function(this:FabSelectize, userOptions:RBOptions) {
+export default function (this: FabSelectize, userOptions: RBOptions) {
+    const options = Object.assign(
+        {
+            label: "&times;",
+            title: "Remove",
+            className: "remove",
+            append: true,
+        },
+        userOptions
+    );
 
-	const options = Object.assign({
-			label     : '&times;',
-			title     : 'Remove',
-			className : 'remove',
-			append    : true
-		}, userOptions);
+    //options.className = 'remove-single';
+    var self = this;
 
+    // override the render method to add remove button to each item
+    if (!options.append) {
+        return;
+    }
 
-	//options.className = 'remove-single';
-	var self			= this;
+    var html = '<a href="javascript:void(0)" class="' + options.className + '" tabindex="-1" title="' + escape_html(options.title) + '">' + options.label + "</a>";
 
-	// override the render method to add remove button to each item
-	if( !options.append ){
-		return;
-	}
+    self.hook("after", "setupTemplates", () => {
+        var orig_render_item = self.settings.render.item;
 
-	var html = '<a href="javascript:void(0)" class="' + options.className + '" tabindex="-1" title="' + escape_html(options.title) + '">' + options.label + '</a>';
+        self.settings.render.item = (data: FabOption, escape: typeof escape_html) => {
+            var item = getDom(orig_render_item.call(self, data, escape)) as FabItem;
 
-	self.hook('after','setupTemplates',() => {
+            var close_button = getDom(html);
+            item.appendChild(close_button);
 
-		var orig_render_item = self.settings.render.item;
+            addEvent(close_button, "mousedown", evt => {
+                preventDefault(evt, true);
+            });
 
-		self.settings.render.item = (data:TomOption, escape:typeof escape_html) => {
+            addEvent(close_button, "click", evt => {
+                // propagating will trigger the dropdown to show for single mode
+                preventDefault(evt, true);
 
-			var item = getDom(orig_render_item.call(self, data, escape)) as TomItem;
+                if (self.isLocked) return;
+                if (!self.shouldDelete([item], evt as MouseEvent)) return;
 
-			var close_button = getDom(html);
-			item.appendChild(close_button);
+                self.removeItem(item);
+                self.refreshOptions(false);
+                self.inputState();
+            });
 
-			addEvent(close_button,'mousedown',(evt) => {
-				preventDefault(evt,true);
-			});
-
-			addEvent(close_button,'click',(evt) => {
-
-				// propagating will trigger the dropdown to show for single mode
-				preventDefault(evt,true);
-
-				if( self.isLocked ) return;
-				if( !self.shouldDelete([item],evt as MouseEvent) ) return;
-
-				self.removeItem(item);
-				self.refreshOptions(false);
-				self.inputState();
-			});
-
-			return item;
-		};
-
-	});
-
-
-};
+            return item;
+        };
+    });
+}

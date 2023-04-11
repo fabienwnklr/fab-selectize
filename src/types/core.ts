@@ -1,60 +1,57 @@
+import FabSelectize from "../fab-selectize";
+import { escape_html } from "../utils";
 
-import FabSelectize from '../fab-selectize';
-import { escape_html } from '../utils';
-
-
-export interface TomInput extends HTMLElement{
-	tomselect				?: FabSelectize;
-	disabled				: boolean;
-	required				: boolean;
-	value					: string;
-	type					: string;
-	validity				: ValidityState;
+export interface FabInput extends HTMLElement {
+    fabselectize?: FabSelectize;
+    disabled: boolean;
+    required: boolean;
+    value: string;
+    type: string;
+    validity: ValidityState;
 }
 
-export type TomArgObject = {
-	silent?: boolean,
+export type FabArgObject = {
+    silent?: boolean;
+};
+
+export type FabOption = { [key: string]: any };
+
+export type FabOptions = { [key: string]: FabOption };
+
+export type FabCreateFilter = (input: string) => boolean;
+
+export type FabCreateCallback = (data?: FabOption) => void;
+
+export type FabCreate = (input: string, create: FabCreateCallback) => boolean;
+
+export interface FabItem extends HTMLElement {
+    dataset: {
+        value: string;
+    };
 }
 
-export type TomOption = {[key:string]:any}
+export type FabLoadCallback = FabSelectize["loadCallback"];
 
-export type TomOptions = {[key: string]: TomOption };
+export type FabTemplate = (data: FabOption, escape: typeof escape_html) => string | HTMLElement;
+export type FabTemplateNull = (data: FabOption, escape: typeof escape_html) => null | string | HTMLElement;
 
-export type TomCreateFilter = (input:string) => boolean;
+export type FabTemplates = {
+    dropdown: FabTemplate;
+    optgroup: FabTemplate;
+    optgroup_header: FabTemplate;
+    option: FabTemplate;
+    item: FabTemplate;
+    option_create: FabTemplate;
+    no_results: FabTemplate;
+    loading: FabTemplate;
+    not_loading: FabTemplateNull;
+    loading_more: FabTemplateNull;
+    no_more_results: FabTemplateNull;
+};
 
-export type TomCreateCallback = (data?:TomOption)=>void;
+export type FabTemplateNames = keyof FabTemplates;
 
-export type TomCreate = (input:string,create:TomCreateCallback) => boolean;
-
-export interface TomItem extends HTMLElement{
-	dataset:{
-		value: string;
-	}
-}
-
-export type TomLoadCallback = FabSelectize['loadCallback'];
-
-
-export type TomTemplate = (data:TomOption, escape:typeof escape_html) => string|HTMLElement;
-export type TomTemplateNull = (data:TomOption, escape:typeof escape_html) => null|string|HTMLElement;
-
-export type TomTemplates = {
-	'dropdown'			: TomTemplate,
-	'optgroup'			: TomTemplate,
-	'optgroup_header'	: TomTemplate,
-	'option'			: TomTemplate,
-	'item'				: TomTemplate,
-	'option_create'		: TomTemplate,
-	'no_results'		: TomTemplate,
-	'loading'			: TomTemplate,
-	'not_loading'		: TomTemplateNull,
-	'loading_more'		: TomTemplateNull,
-	'no_more_results'	: TomTemplateNull,
-}
-
-export type TomTemplateNames = keyof TomTemplates;
-
-export type TomClearFilter = (option:TomOption,value:string) => boolean;
+export type FabClearFilter = (option: FabOption, value: string) => boolean;
 
 export type RecursivePartial<T> = {
     [P in keyof T]?: RecursivePartial<T[P]>;

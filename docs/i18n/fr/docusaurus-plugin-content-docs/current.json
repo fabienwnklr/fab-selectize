@@ -1,0 +1,42 @@
+{
+  "version.label": {
+    "message": "Current Version (0.15.x)",
+    "description": "The label for version current"
+  },
+  "sidebar.demoSidebar.category.FabSelectize demos": {
+    "message": "FabSelectize demos",
+    "description": "The label for category FabSelectize demos in sidebar demoSidebar"
+  },
+  "sidebar.demoSidebar.category.FabSelectize demos.link.generated-index.title": {
+    "message": "Examples",
+    "description": "The generated-index page title for category FabSelectize demos in sidebar demoSidebar"
+  },
+  "sidebar.demoSidebar.category.FabSelectize demos.link.generated-index.description": {
+    "message": "Example how we can use FabSelectize.js",
+    "description": "The generated-index page description for category FabSelectize demos in sidebar demoSidebar"
+  },
+  "sidebar.demoSidebar.category.FabSelectize plugin demos": {
+    "message": "FabSelectize plugin demos",
+    "description": "The label for category FabSelectize plugin demos in sidebar demoSidebar"
+  },
+  "sidebar.demoSidebar.category.FabSelectize plugin demos.link.generated-index.title": {
+    "message": "Examples using plugins",
+    "description": "The generated-index page title for category FabSelectize plugin demos in sidebar demoSidebar"
+  },
+  "sidebar.demoSidebar.category.FabSelectize plugin demos.link.generated-index.description": {
+    "message": "Example how we can use FabSelectize.js with plugins",
+    "description": "The generated-index page description for category FabSelectize plugin demos in sidebar demoSidebar"
+  },
+  "sidebar.apiSidebar.category.Guides": {
+    "message": "Guides",
+    "description": "The label for category Guides in sidebar apiSidebar"
+  },
+  "sidebar.apiSidebar.category.Guides.link.generated-index.title": {
+    "message": "FabSelectize Api Guides",
+    "description": "The generated-index page title for category Guides in sidebar apiSidebar"
+  },
+  "sidebar.apiSidebar.category.Guides.link.generated-index.description": {
+    "message": "Check all api documentation that you can use with FabSelectize.js",
+    "description": "The generated-index page description for category Guides in sidebar apiSidebar"
+  }
+}
