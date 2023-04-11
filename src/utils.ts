@@ -1,27 +1,7 @@
-/**
- * If the browser supports the User-Agent Client Hint, then return the platform name, otherwise return
- * the result of a regular expression test on the user agent string
- *
- * @param platform - The platform you want to detect.
- * @param re - A regular expression that matches the user agent string.
- * @returns {Boolean} A boolean value.
- */
-export function uaDetect(platform: string, re: RegExp): boolean {
-  if (navigator.userAgent) {
-    return platform === navigator.userAgent;
-  }
 
-  return re.test(navigator.userAgent);
-}
-/**
- * Determines if the provided value has been defined.
- *
- * @param {mixed} object
- * @returns {boolean}
- */
-export function isset(object: any): boolean {
-    return typeof object !== "undefined";
-};
+import FabSelectize from './fab-selectize';
+import { TomLoadCallback } from './types/index';
+
 
 /**
  * Converts a scalar to its best string representation
@@ -36,369 +16,176 @@ export function isset(object: any): boolean {
  *   0         -> '0'
  *   1         -> '1'
  *
- * @param {string} value
- * @returns {string|null}
  */
-export function hash_key(value: string): string | null {
-    if (typeof value === "undefined" || value === null) return null;
-    if (typeof value === "boolean") return value ? "1" : "0";
-    return value + "";
+export const hash_key = (value:undefined|null|boolean|string|number):string|null => {
+	if (typeof value === 'undefined' || value === null) return null;
+	return get_hash(value);
+};
+
+export const get_hash = (value:boolean|string|number):string => {
+	if (typeof value === 'boolean') return value ? '1' : '0';
+	return value + '';
 };
 
 /**
  * Escapes a string for use within HTML.
  *
- * @param {string} str
- * @returns {string}
  */
-export function escape_html(str: string): string {
-    return (str + "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+export const escape_html = (str:string):string => {
+	return (str + '')
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
 };
 
-// /**
-//  * Escapes "$" characters in replacement strings.
-//  *
-//  * @param {string} str
-//  * @returns {string}
-//  */
-// var escape_replace = function (str) {
-//     return (str + "").replace(/\$/g, "$$$$");
-// };
 
-// var hook = {};
+/**
+ * Debounce the user provided load function
+ *
+ */
+export const loadDebounce = (fn:(value:string,callback:TomLoadCallback) => void,delay:number) => {
+	var timeout: null|ReturnType<typeof setTimeout>;
+	return function(this:FabSelectize, value:string,callback:TomLoadCallback) {
+		var self = this;
 
-// /**
-//  * Wraps `method` on `self` so that `fn`
-//  * is invoked before the original method.
-//  *
-//  * @param {object} self
-//  * @param {string} method
-//  * @param {function} fn
-//  */
-// hook.before = function (self, method, fn) {
-//     var original = self[method];
-//     self[method] = function () {
-//         fn.apply(self, arguments);
-//         return original.apply(self, arguments);
-//     };
-// };
+		if( timeout ){
+			self.loading = Math.max(self.loading - 1, 0);
+			clearTimeout(timeout);
+		}
+		timeout = setTimeout(function() {
+			timeout = null;
+			self.loadedSearches[value] = true;
+			fn.call(self, value, callback);
 
-// /**
-//  * Wraps `method` on `self` so that `fn`
-//  * is invoked after the original method.
-//  *
-//  * @param {object} self
-//  * @param {string} method
-//  * @param {function} fn
-//  */
-// hook.after = function (self, method, fn) {
-//     var original = self[method];
-//     self[method] = function () {
-//         var result = original.apply(self, arguments);
-//         fn.apply(self, arguments);
-//         return result;
-//     };
-// };
+		}, delay);
+	};
+};
 
-// /**
-//  * Wraps `fn` so that it can only be invoked once.
-//  *
-//  * @param {function} fn
-//  * @returns {function}
-//  */
-// var once = function (fn) {
-//     var called = false;
-//     return function () {
-//         if (called) return;
-//         called = true;
-//         fn.apply(this, arguments);
-//     };
-// };
 
-// /**
-//  * Wraps `fn` so that it can only be called once
-//  * every `delay` milliseconds (invoked on the falling edge).
-//  *
-//  * @param {function} fn
-//  * @param {number} delay
-//  * @returns {function}
-//  */
-// var debounce = function (fn, delay) {
-//     var timeout;
-//     return function () {
-//         var self = this;
-//         var args = arguments;
-//         window.clearTimeout(timeout);
-//         timeout = window.setTimeout(function () {
-//             fn.apply(self, args);
-//         }, delay);
-//     };
-// };
+/**
+ * Debounce all fired events types listed in `types`
+ * while executing the provided `fn`.
+ *
+ */
+export const debounce_events = ( self:FabSelectize, types:string[], fn:() => void ) => {
+	var type:string;
+	var trigger = self.trigger;
+	var event_args:{ [key: string]: any } = {};
 
-// /**
-//  * Debounce all fired events types listed in `types`
-//  * while executing the provided `fn`.
-//  *
-//  * @param {object} self
-//  * @param {array} types
-//  * @param {function} fn
-//  */
-// var debounce_events = function (self, types, fn) {
-//     var type;
-//     var trigger = self.trigger;
-//     var event_args = {};
+	// override trigger method
+	self.trigger = function(){
+		var type = arguments[0];
+		if (types.indexOf(type) !== -1) {
+			event_args[type] = arguments;
+		} else {
+			return trigger.apply(self, arguments);
+		}
+	};
 
-//     // override trigger method
-//     self.trigger = function () {
-//         var type = arguments[0];
-//         if (types.indexOf(type) !== -1) {
-//             event_args[type] = arguments;
-//         } else {
-//             return trigger.apply(self, arguments);
-//         }
-//     };
+	// invoke provided function
+	fn.apply(self, []);
+	self.trigger = trigger;
 
-//     // invoke provided function
-//     fn.apply(self, []);
-//     self.trigger = trigger;
+	// trigger queued events
+	for( type of types ){
+		if( type in event_args ){
+			trigger.apply(self, event_args[type]);
+		}
+	}
+};
 
-//     // trigger queued events
-//     for (type in event_args) {
-//         if (event_args.hasOwnProperty(type)) {
-//             trigger.apply(self, event_args[type]);
-//         }
-//     }
-// };
 
-// /**
-//  * A workaround for http://bugs.jquery.com/ticket/6696
-//  *
-//  * @param {object} $parent - Parent element to listen on.
-//  * @param {string} event - Event name.
-//  * @param {string} selector - Descendant selector to filter by.
-//  * @param {function} fn - Event handler.
-//  */
-// var watchChildEvent = function ($parent, event, selector, fn) {
-//     $parent.on(event, selector, function (e) {
-//         var child = e.target;
-//         while (child && child.parentNode !== $parent[0]) {
-//             child = child.parentNode;
-//         }
-//         e.currentTarget = child;
-//         return fn.apply(this, [e]);
-//     });
-// };
+/**
+ * Determines the current selection within a text input control.
+ * Returns an object containing:
+ *   - start
+ *   - length
+ *
+ */
+export const getSelection = (input:HTMLInputElement):{ start: number; length: number } => {
+	return {
+		start	: input.selectionStart || 0,
+		length	: (input.selectionEnd||0) - (input.selectionStart||0),
+	};
+};
 
-// /**
-//  * Determines the current selection within a text input control.
-//  * Returns an object containing:
-//  *   - start
-//  *   - length
-//  *
-//  * @param {object} input
-//  * @returns {object}
-//  */
-// var getInputSelection = function (input) {
-//     var result = {};
-//     if (input === undefined) {
-//         console.warn("WARN getInputSelection cannot locate input control");
-//         return result;
-//     }
-//     if ("selectionStart" in input) {
-//         result.start = input.selectionStart;
-//         result.length = input.selectionEnd - result.start;
-//     } else if (document.selection) {
-//         input.focus();
-//         var sel = document.selection.createRange();
-//         var selLen = document.selection.createRange().text.length;
-//         sel.moveStart("character", -input.value.length);
-//         result.start = sel.text.length - selLen;
-//         result.length = selLen;
-//     }
-//     return result;
-// };
 
-// /**
-//  * Copies CSS properties from one element to another.
-//  *
-//  * @param {object} $from
-//  * @param {object} $to
-//  * @param {array} properties
-//  */
-// var transferStyles = function ($from, $to, properties) {
-//     var i,
-//         n,
-//         styles = {};
-//     if (properties) {
-//         for (i = 0, n = properties.length; i < n; i++) {
-//             styles[properties[i]] = $from.css(properties[i]);
-//         }
-//     } else {
-//         styles = $from.css();
-//     }
-//     $to.css(styles);
-// };
+/**
+ * Prevent default
+ *
+ */
+export const preventDefault = (evt?:Event, stop:boolean=false):void => {
+	if( evt ){
+		evt.preventDefault();
+		if( stop ){
+			evt.stopPropagation();
+		}
+	}
+}
 
-// /**
-//  * Measures the width of a string within a
-//  * parent element (in pixels).
-//  *
-//  * @param {string} str
-//  * @param {object} $parent
-//  * @returns {number}
-//  */
-// var measureString = function (str, $parent) {
-//     if (!str) {
-//         return 0;
-//     }
 
-//     if (!Selectize.$testInput) {
-//         Selectize.$testInput = $("<span />").css({
-//             position: "absolute",
-//             width: "auto",
-//             padding: 0,
-//             whiteSpace: "pre",
-//         });
+/**
+ * Add event helper
+ *
+ */
+export const addEvent = (target:EventTarget, type:string, callback:EventListenerOrEventListenerObject, options?:object):void => {
+	target.addEventListener(type,callback,options);
+};
 
-//         $("<div />")
-//             .css({
-//                 position: "absolute",
-//                 width: 0,
-//                 height: 0,
-//                 overflow: "hidden",
-//             })
-//             .attr({
-//                 "aria-hidden": true,
-//             })
-//             .append(Selectize.$testInput)
-//             .appendTo("body");
-//     }
 
-//     Selectize.$testInput.text(str);
+/**
+ * Return true if the requested key is down
+ * Will return false if more than one control character is pressed ( when [ctrl+shift+a] != [ctrl+a] )
+ * The current evt may not always set ( eg calling advanceSelection() )
+ *
+ */
+export const isKeyDown = ( key_name:keyof (KeyboardEvent|MouseEvent), evt?:KeyboardEvent|MouseEvent ) => {
 
-//     transferStyles($parent, Selectize.$testInput, ["letterSpacing", "fontSize", "fontFamily", "fontWeight", "textTransform"]);
+	if( !evt ){
+		return false;
+	}
 
-//     return Selectize.$testInput.width();
-// };
+	if( !evt[key_name] ){
+		return false;
+	}
 
-// /**
-//  * Sets up an input to grow horizontally as the user
-//  * types. If the value is changed manually, you can
-//  * trigger the "update" handler to resize:
-//  *
-//  * $input.trigger('update');
-//  *
-//  * @param {object} $input
-//  */
-// var autoGrow = function ($input) {
-//     var currentWidth = null;
+	var count = (evt.altKey?1:0) + (evt.ctrlKey?1:0) + (evt.shiftKey?1:0) + (evt.metaKey?1:0);
 
-//     var update = function (e, options) {
-//         var value, keyCode, printable, width;
-//         var placeholder, placeholderWidth;
-//         var shift, character, selection;
-//         e = e || window.event || {};
-//         options = options || {};
+	if( count === 1 ){
+		return true;
+	}
 
-//         if (e.metaKey || e.altKey) return;
-//         if (!options.force && $input.data("grow") === false) return;
+	return false;
+};
 
-//         value = $input.val();
-//         if (e.type && e.type.toLowerCase() === "keydown") {
-//             keyCode = e.keyCode;
-//             printable =
-//                 (keyCode >= 48 && keyCode <= 57) || // 0-9
-//                 (keyCode >= 65 && keyCode <= 90) || // a-z
-//                 (keyCode >= 96 && keyCode <= 111) || // numpad 0-9, numeric operators
-//                 (keyCode >= 186 && keyCode <= 222) || // semicolon, equal, comma, dash, etc.
-//                 keyCode === 32; // space
 
-//             if (keyCode === KEY_DELETE || keyCode === KEY_BACKSPACE) {
-//                 selection = getInputSelection($input[0]);
-//                 if (selection.length) {
-//                     value = value.substring(0, selection.start) + value.substring(selection.start + selection.length);
-//                 } else if (keyCode === KEY_BACKSPACE && selection.start) {
-//                     value = value.substring(0, selection.start - 1) + value.substring(selection.start + 1);
-//                 } else if (keyCode === KEY_DELETE && typeof selection.start !== "undefined") {
-//                     value = value.substring(0, selection.start) + value.substring(selection.start + 1);
-//                 }
-//             } else if (printable) {
-//                 shift = e.shiftKey;
-//                 character = String.fromCharCode(e.keyCode);
-//                 if (shift) character = character.toUpperCase();
-//                 else character = character.toLowerCase();
-//                 value += character;
-//             }
-//         }
+/**
+ * Get the id of an element
+ * If the id attribute is not set, set the attribute with the given id
+ *
+ */
+export const getId = (el:Element,id:string) => {
+	const existing_id = el.getAttribute('id');
+	if( existing_id ){
+		return existing_id;
+	}
 
-//         var width = $input.attr("readonly") ? 0 : 4;
-//         placeholder = $input.attr("placeholder");
-//         if (placeholder) {
-//             placeholderWidth = measureString(placeholder, $input) + width;
-//         } else {
-//             placeholderWidth = 0;
-//         }
+	el.setAttribute('id',id);
+	return id;
+};
 
-//         width = Math.max(measureString(value, $input), placeholderWidth) + width;
-//         if (width !== currentWidth) {
-//             currentWidth = width;
-//             $input.width(width);
-//             $input.triggerHandler("resize");
-//         }
-//     };
 
-//     $input.on("keydown keyup update blur", update);
-//     update();
-// };
+/**
+ * Returns a string with backslashes added before characters that need to be escaped.
+ */
+export const addSlashes = (str:string):string => {
+	return str.replace(/[\\"']/g, '\\$&');
+};
 
-// var domToString = function (d) {
-//     var tmp = document.createElement("div");
-
-//     tmp.appendChild(d.cloneNode(true));
-
-//     return tmp.innerHTML;
-// };
-
-// var logError = function (message, options) {
-//     if (!options) options = {};
-//     var component = "Selectize";
-
-//     console.error(component + ": " + message);
-
-//     if (options.explanation) {
-//         // console.group is undefined in <IE11
-//         if (console.group) console.group();
-//         console.error(options.explanation);
-//         if (console.group) console.groupEnd();
-//     }
-// };
-
-// /**
-//  * Determines whether or not the `data` argument is a valid JSON string.
-//  *
-//  * @param {String} data Data to test
-//  * @returns {Boolean} true if is an JSON object
-//  */
-// var isJSON = function (data) {
-//     try {
-//         JSON.parse(data);
-//     } catch (e) {
-//         return false;
-//     }
-//     return true;
-// };
-
-// /**
-//  *
-//  * @param {HTMLEle} el Element to check
-//  * @returns {Boolean}
-//  */
-// function isInViewport(el) {
-//     const rect = el.getBoundingClientRect();
-//     return (
-//         rect.top >= 0 &&
-//         rect.left >= 0 &&
-//         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-//         rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-//     );
-// }
+/**
+ *
+ */
+export const append = ( parent:Element|DocumentFragment, node: string|Node|null|undefined ):void =>{
+	if( node ) parent.append(node);
+};

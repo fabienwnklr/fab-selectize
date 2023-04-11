@@ -1,100 +1,92 @@
-import { Selectize } from "./types";
 
-export const defaults: Selectize.IOptions<string , any> = {
-    options: [],
-    optgroups: [],
+export default {
+	options: [],
+	optgroups: [],
 
-    plugins: [],
-    delimiter: ",",
-    splitOn: null, // regexp or string for splitting up values from a paste command
-    persist: true,
-    diacritics: true,
-    create: false,
-    showAddOptionOnCreate: true,
-    createOnBlur: false,
-    createFilter: null,
-    highlight: true,
-    openOnFocus: true,
-    maxOptions: 1000,
-    maxItems: null,
-    hideSelected: null,
-    addPrecedence: false,
-    selectOnTab: true,
-    preload: false,
-    allowEmptyOption: false,
-    showEmptyOptionInDropdown: false,
-    emptyOptionLabel: "--",
-    setFirstOptionActive: false,
-    closeAfterSelect: false,
-    closeDropdownThreshold: 250, // number of ms to prevent reopening of dropdown after mousedown
+	plugins: [],
+	delimiter: ',',
+	splitOn: null, // regexp or string for splitting up values from a paste command
+	persist: true,
+	diacritics: true,
+	create: null,
+	createOnBlur: false,
+	createFilter: null,
+	highlight: true,
+	openOnFocus: true,
+	shouldOpen: null,
+	maxOptions: 50,
+	maxItems: null,
+	hideSelected: null,
+	duplicates: false,
+	addPrecedence: false,
+	selectOnTab: false,
+	preload: null,
+	allowEmptyOption: false,
+	//closeAfterSelect: false,
 
-    scrollDuration: 60,
-    deselectBehavior: "previous", //top, previous
-    loadThrottle: 300,
-    loadingClass: "loading",
+	loadThrottle: 300,
+	loadingClass: 'loading',
 
-    dataAttr: "data-data",
-    optgroupField: "optgroup",
-    valueField: "value",
-    labelField: "text",
-    disabledField: "disabled",
-    optgroupLabelField: "label",
-    optgroupValueField: "value",
-    lockOptgroupOrder: false,
+	dataAttr: null, //'data-data',
+	optgroupField: 'optgroup',
+	valueField: 'value',
+	labelField: 'text',
+	disabledField: 'disabled',
+	optgroupLabelField: 'label',
+	optgroupValueField: 'value',
+	lockOptgroupOrder: false,
 
-    sortField: "$order",
-    searchField: ["text"],
-    searchConjunction: "and",
-    respect_word_boundaries: false, // Originally defaulted to true, but breaks unicode support. See #1916 & https://stackoverflow.com/questions/10590098/javascript-regexp-word-boundaries-unicode-characters
-    normalize: true,
+	sortField: '$order',
+	searchField: ['text'],
+	searchConjunction: 'and',
 
-    mode: 'single',
-    wrapperClass: "",
-    inputClass: "",
-    dropdownClass: "",
-    dropdownContentClass: "",
+	mode: null,
+	wrapperClass: 'ts-wrapper',
+	controlClass: 'ts-control',
+	dropdownClass: 'ts-dropdown',
+	dropdownContentClass: 'ts-dropdown-content',
+	itemClass: 'item',
+	optionClass: 'option',
 
-    dropdownParent: null,
+	dropdownParent: null,
+	controlInput: '<input type="text" autocomplete="off" size="1" />',
 
-    copyClassesToDropdown: true,
-    dropdownSize: {
-        sizeType: "auto",
-        sizeValue: "auto",
-    },
+	copyClassesToDropdown: false,
 
-    ignoreOnDropwdownHeight: "img, i",
-    search: true,
-    showArrow: true,
+	placeholder: null,
+	hidePlaceholder: null,
 
-    /*
-  load                 : null, // function(query, callback) { ... }
-  score                : null, // function(search) { ... }
-  formatValueToKey     : null, // function(key) { ... }
-  optionGroupRegister  : null, // function(optgroup) to register dynamically created option groups
-  onInitialize         : null, // function() { ... }
-  onChange             : null, // function(value) { ... }
-  onItemAdd            : null, // function(value, $item) { ... }
-  onItemRemove         : null, // function(value, $item) { ... }
-  onClear              : null, // function() { ... }
-  onOptionAdd          : null, // function(value, data) { ... }
-  onOptionRemove       : null, // function(value) { ... }
-  onOptionClear        : null, // function() { ... }
-  onOptionGroupAdd     : null, // function(id, data) { ... }
-  onOptionGroupRemove  : null, // function(id) { ... }
-  onOptionGroupClear   : null, // function() { ... }
-  onDropdownOpen       : null, // function($dropdown) { ... }
-  onDropdownClose      : null, // function($dropdown) { ... }
-  onType               : null, // function(str) { ... }
-  onDelete             : null, // function(values) { ... }
-  */
+	shouldLoad: function(query:string):boolean{
+		return query.length > 0;
+	},
 
-    render: {
-        /*
-    item: null,
-    optgroup: null,
-    optgroup_header: null,
-    option: null,
-    option_create: null
-    */
-    },
+	/*
+	load                 : null, // function(query, callback) { ... }
+	score                : null, // function(search) { ... }
+	onInitialize         : null, // function() { ... }
+	onChange             : null, // function(value) { ... }
+	onItemAdd            : null, // function(value, $item) { ... }
+	onItemRemove         : null, // function(value) { ... }
+	onClear              : null, // function() { ... }
+	onOptionAdd          : null, // function(value, data) { ... }
+	onOptionRemove       : null, // function(value) { ... }
+	onOptionClear        : null, // function() { ... }
+	onOptionGroupAdd     : null, // function(id, data) { ... }
+	onOptionGroupRemove  : null, // function(id) { ... }
+	onOptionGroupClear   : null, // function() { ... }
+	onDropdownOpen       : null, // function(dropdown) { ... }
+	onDropdownClose      : null, // function(dropdown) { ... }
+	onType               : null, // function(str) { ... }
+	onDelete             : null, // function(values) { ... }
+	*/
+
+	render: {
+		/*
+		item: null,
+		optgroup: null,
+		optgroup_header: null,
+		option: null,
+		option_create: null
+		*/
+	}
 };

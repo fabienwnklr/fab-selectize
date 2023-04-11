@@ -1,9 +1,7 @@
-// Type definitions for Selectize 0.15.3
+// Type definitions for Selectize 1.0.0
 // Project: https://github.com/fabienwnklr/selectize.js
-// Definitions by: Adi Dahiya <https://github.com/adidahiya>, Natalie Bausch <https://github.com/naBausch>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-/// <reference types="jquery"/>
+import Selectize from './Selectize';
 
 export declare namespace Selectize {
     // see https://github.com/fabienwnklr/selectize.js/blob/master/docs/usage.md
@@ -682,4 +680,6 @@ interface JQuery {
 interface HTMLElement {
     selectize: Selectize.IApi<any, any>;
 }
+
+export type loadCallback = Selectize['loadCallback'];
 
